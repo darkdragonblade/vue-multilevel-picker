@@ -9,6 +9,13 @@
     "start": "npm run dev",
     "build": "node build/build.js"
   },
+  "keywords": [
+		"darkdragonblade",
+		"vue",
+		"picker",
+    "multilevel-picker",
+    "javascript"
+	],
   "dependencies": {
     "vue": "^2.5.2",
     "vue-router": "^3.0.1"
