@@ -12,7 +12,7 @@
 <multilevel @change="change" columns=2 separator="--" placeholder="请选择地址" :data="city-json"></multilevel>
 
 ## 附上JSON 下载地址
-https://github.com/darkdragonblade/vue-multilevel-picker/blob/master/static/city-json.rar?raw=true
+https://github.com/darkdragonblade/vue-multilevel-picker/blob/master/static/city-data.rar?raw=true
 
 ### github 地址
 https://github.com/darkdragonblade/vue-multilevel-picker

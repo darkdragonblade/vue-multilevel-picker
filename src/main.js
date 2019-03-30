@@ -3,9 +3,7 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-// import picker from '../src/component/index';
 
-// Vue.use(picker);
 import multilevel from '../src/component/multilevel';
 Vue.component('multilevel',multilevel);
 
