@@ -1,6 +1,7 @@
 <template>
   <div class="home">
-    <multilevel @change="change" :data="data" :column="'3'"></multilevel>
+    <multilevel @done="done" @change="change" :data="data" :column="'3'"></multilevel>
+     <!--<div id="div1">asd</div>-->
   </div>
 </template>
 
@@ -15,11 +16,27 @@ export default {
     
   },
   mounted() {
-    this.data = cityData
+    this.data = cityData;
+  //   var o = document.getElementById("div1");
+  // // 动画开始时事件
+  // o.addEventListener("webkitAnimationStart", function() {
+  //     console.log("动画开始");
+  // })
+  // // 动画重复运动时事件
+  // o.addEventListener("webkitAnimationIteration", function() {
+  //     console.log("动画重复运动");
+  // })
+  // // 动画结束时事件
+  // o.addEventListener("webkitAnimationEnd", function() {
+  //     console.log("动画结束");
+  // })
   },
   methods: {
     change(data){
      
+    },
+    done(data){
+      
     }
   },
   
@@ -41,5 +58,13 @@ li {
 }
 a {
   color: #42b983;
+}
+#div1{
+  animation:mymove 2s infinite 
+}
+@keyframes mymove
+{
+from {margin-top:0px;}
+to {margin-top:200px;}
 }
 </style>

@@ -108,14 +108,13 @@ export default {
         this.$emit('change',data);
       },
       done(){
-     
-         this.pickerText = [];
-     
+        this.pickerText = [];
         for(let i = 0;i<this.changeData.length;i++)
         {
             this.pickerText.push(this.changeData[i].name);
         }
-        this.pickerText = this.pickerText.join(this.separator)
+        this.pickerText = this.pickerText.join(this.separator);
+        this.$emit('done',this.changeData)
       }
   }
 }
