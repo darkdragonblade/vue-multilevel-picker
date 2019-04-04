@@ -145,7 +145,7 @@ export default {
           this.openPicker = false;
       },
       change(data){
-     
+        
         if(data.refresh)
         {
             this.columnText.push(data);

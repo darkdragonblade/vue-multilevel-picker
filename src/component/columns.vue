@@ -73,7 +73,7 @@ export default {
         this.y = 0;
         this.velocity = 0;
         this.lastIndex = -9999;
-        this.componentsInt(false);
+        this.componentsInt(false,true);
     }
   },
   mounted(){
@@ -107,10 +107,10 @@ export default {
     },
 
 
-    componentsInt(fresher){
+    componentsInt(fresher,done){
         this.optHeight = (this.$refs.column.firstElementChild ? this.$refs.column.firstElementChild.clientHeight : 46);
         this.rotateFactor = -0.46;
-        this.update(0, 0, false, fresher);
+        this.update(0, 0, false, fresher,done);
     },
     columnsInit(){
         this.$el.addEventListener('touchstart',(ev)=>{
@@ -155,10 +155,10 @@ export default {
         })
         this.$el.addEventListener('touchend',(ev)=>{
             if (this.bounceFrom > 0) {
-            this.update(this.minY, 150, true);
+            this.update(this.minY, 150, true , false,true);
             return;
             } else if (this.bounceFrom < 0) {
-            this.update(this.maxY, 150, true);
+            this.update(this.maxY, 150, true , false,true);
             return;
             }
             if (this.startY === null)  return; 
@@ -195,7 +195,7 @@ export default {
         this.velocity = 0;
       }
 
-      this.update(y, 0, true);
+      this.update(y, 0, true,false,true);
       const notLockedIn = (Math.round(y) % this.optHeight !== 0) || (Math.abs(this.velocity) > 1);
       if (notLockedIn) {
         this.rafId = requestAnimationFrame(() => this.decelerate());
@@ -207,7 +207,7 @@ export default {
       this.decelerate();
     }  
     },
-    update(y, duration, saveY, refresh)
+    update(y, duration, saveY, refresh,done)
     {
         y = Math.round(y);
         let translateY = 0;
@@ -216,7 +216,7 @@ export default {
         const selectedIndex = this.indexForY(-y);
 
         var children = this.$el.children[0].children;
-   
+        
         const durationStr = (duration === 0) ? '' : duration + 'ms';
         for (let i = 0; i < children.length; i++) {
             const button = children[i];
@@ -256,17 +256,6 @@ export default {
         }
         if (saveY) {
             this.y = y;
-            if((Math.abs(this.y % this.optHeight)==0 && Math.abs(this.velocity)==1) || Math.abs(this.y % this.optHeight)==0 && Math.abs(this.velocity)==0)
-            {
-                this.$emit('change',{
-                    column:this.column[this.lastIndex],
-                    name:this.column[this.lastIndex].name,
-                    index:this.lastIndex,
-                    timeStamp:this.timeStamp,
-                    refresh:refresh
-                });
-            }
-    
         }
         if (this.lastIndex !== selectedIndex) {
             this.lastIndex = selectedIndex;
@@ -280,7 +269,17 @@ export default {
                     refresh:refresh
                 });
             }
-            
+        }
+  
+        if((Math.abs(this.y % this.optHeight)==0 && Math.abs(this.velocity)==1 && done) || (Math.abs(this.y % this.optHeight)==0 && Math.abs(this.velocity)==0 && done))
+        {
+            this.$emit('change',{
+                    column:this.column[this.lastIndex],
+                    name:this.column[this.lastIndex].name,
+                    index:this.lastIndex,
+                    timeStamp:this.timeStamp,
+                    refresh:refresh
+                });
         }
         
     },

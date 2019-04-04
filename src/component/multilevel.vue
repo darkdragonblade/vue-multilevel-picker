@@ -90,14 +90,18 @@ export default {
         if(data[1] && data[1].refresh) this.index[1] = data[1].index;
         if(data[0] && !data[0].refresh && data[0].index != this.index[0])
         {
-            
             if(this.column>=2)
             {
                 this.pickerComponent.vm.columnArr[1] = this.data[data[0].index].children;
                 if(this.column>=3)
-                this.pickerComponent.vm.columnArr[2] = this.data[data[0].index].children[0].children;
+                {
+                     this.pickerComponent.vm.columnArr[2] = this.data[data[0].index].children[0].children;
+
+                }
+               
                 this.pickerComponent.vm.column++;
                 this.index[0] = data[0].index;
+            
             }
         
         }
