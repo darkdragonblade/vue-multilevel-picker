@@ -16,7 +16,7 @@ export default {
     
   },
   mounted() {
-    this.data = cityData;
+    this.data = cityData
   //   var o = document.getElementById("div1");
   // // 动画开始时事件
   // o.addEventListener("webkitAnimationStart", function() {

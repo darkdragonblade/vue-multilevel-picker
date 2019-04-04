@@ -55,6 +55,7 @@
 const PICKER_OPT_SELECTED = 'picker-opt-selected';
 const DECELERATION_FRICTION = 0.97;
 const TRANSITION_DURATION = 150;
+const MAX_PICKER_SPEED = 90;
 
 export default {
   name:'columns',
@@ -76,6 +77,7 @@ export default {
     }
   },
   mounted(){
+     
         this.timeStamp = Date.now();
         this.columnsInit();
         this.componentsInt(true);
@@ -91,10 +93,20 @@ export default {
     startY:0,
     y:0,
     rotateFactor:0,
-    timeStamp:'',
+    timeStamp:''
     }
   },
   methods: {
+  
+        step(){
+            this.startY++;
+          
+        if (this.startY < 100) {
+            window.requestAnimationFrame(this.step);
+        }
+    },
+
+
     componentsInt(fresher){
         this.optHeight = (this.$refs.column.firstElementChild ? this.$refs.column.firstElementChild.clientHeight : 46);
         this.rotateFactor = -0.46;
@@ -103,6 +115,8 @@ export default {
     columnsInit(){
         this.$el.addEventListener('touchstart',(ev)=>{
             ev.preventDefault();
+            this.velocity = 0;
+            cancelAnimationFrame(this.rafId);
             this.startY = this.pointerCoord(ev).y;
             const options = this.$refs.column.children;
             let minY = (options.length - 1);
@@ -113,7 +127,6 @@ export default {
                     maxY = Math.max(maxY, i);
                 }
             }
-
             this.minY = -(minY * this.optHeight);
             this.maxY = -(maxY * this.optHeight);
         })
@@ -142,19 +155,16 @@ export default {
         })
         this.$el.addEventListener('touchend',(ev)=>{
             if (this.bounceFrom > 0) {
-            this.update(this.minY, 150, false);
+            this.update(this.minY, 150, true);
             return;
             } else if (this.bounceFrom < 0) {
-            this.update(this.maxY, 150, false);
+            this.update(this.maxY, 150, true);
             return;
             }
-            if (this.startY === null) {
-                return;
-            }
+            if (this.startY === null)  return; 
             var /** @type {?} */ endY = this.pointerCoord(ev).y;
    
-            this.velocity = parseInt(endY - this.startY)/10;
-         
+            this.velocity = this.clamp(-MAX_PICKER_SPEED, parseInt(endY - this.startY)/20, MAX_PICKER_SPEED);
             if (Math.abs(endY - this.startY) > 3) {
                 
                 var /** @type {?} */ y = this.y + (endY - this.startY);
@@ -165,14 +175,17 @@ export default {
         })
     },
     decelerate(){
+   
       if (this.velocity !== 0) {
+  
       this.velocity *= DECELERATION_FRICTION;
+     
       this.velocity = (this.velocity > 0)
         ? Math.max(this.velocity, 1)
         : Math.min(this.velocity, -1);
 
       let y = this.y + this.velocity;
-
+       
       if (y > this.minY) {
         y = this.minY;
         this.velocity = 0;
@@ -186,19 +199,13 @@ export default {
       const notLockedIn = (Math.round(y) % this.optHeight !== 0) || (Math.abs(this.velocity) > 1);
       if (notLockedIn) {
         this.rafId = requestAnimationFrame(() => this.decelerate());
-         
       }
-
-
-    } else if (this.y % this.optHeight !== 0) {
-        
+    } 
+    else if (this.y % this.optHeight !== 0) {
       const currentPos = Math.abs(this.y % this.optHeight);
-   
       this.velocity = (currentPos > (this.optHeight / 2) ? 1 : -1);
-
       this.decelerate();
-    }
-
+    }  
     },
     update(y, duration, saveY, refresh)
     {
@@ -209,7 +216,7 @@ export default {
         const selectedIndex = this.indexForY(-y);
 
         var children = this.$el.children[0].children;
-        
+   
         const durationStr = (duration === 0) ? '' : duration + 'ms';
         for (let i = 0; i < children.length; i++) {
             const button = children[i];
@@ -249,18 +256,36 @@ export default {
         }
         if (saveY) {
             this.y = y;
+            if((Math.abs(this.y % this.optHeight)==0 && Math.abs(this.velocity)==1) || Math.abs(this.y % this.optHeight)==0 && Math.abs(this.velocity)==0)
+            {
+                this.$emit('change',{
+                    column:this.column[this.lastIndex],
+                    name:this.column[this.lastIndex].name,
+                    index:this.lastIndex,
+                    timeStamp:this.timeStamp,
+                    refresh:refresh
+                });
+            }
+    
         }
         if (this.lastIndex !== selectedIndex) {
             this.lastIndex = selectedIndex;
-            this.$emit('change',{
-                column:this.column[this.lastIndex],
-                name:this.column[this.lastIndex].name,
-                index:this.lastIndex,
-                timeStamp:this.timeStamp,
-                refresh:refresh
-            });
-    
+            if(refresh)
+            {
+                this.$emit('change',{
+                    column:this.column[this.lastIndex],
+                    name:this.column[this.lastIndex].name,
+                    index:this.lastIndex,
+                    timeStamp:this.timeStamp,
+                    refresh:refresh
+                });
+            }
+            
         }
+        
+    },
+    clamp(min, n, max) {
+        return Math.max(min, Math.min(n, max));
     },
     indexForY(y) {
         return Math.min(Math.max(Math.abs(Math.round(y / this.optHeight)), 0), this.column.length - 1);
